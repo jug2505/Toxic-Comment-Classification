@@ -52,6 +52,60 @@ def train_model(path, model, continuous=True, saveto=None, cv=12):
     continuous = True - нужно вызвать функцию continuous,
     чтобы получить входные значения X и целевые значения Y
     """
+    # Загружаем данные из корпуса TODO: класс PickledCommentsReader
+    corpus = PickledCommentsReader(path)
+    X = documents(corpus)
+    # Разделён ли уже на категории
+    if continuous:
+        Y = continuous(corpus)
+        score = 'r2_score'
+    else:
+        Y = make_categorical(corpus)
+        score = 'f1_score'
+
+    # Вычислим оценки
+    scores = cross_val_score(model, X, Y, cv=cv)
+    # Обучаем модель
+    model.fit(X, Y)
+
+    # Запись на диск
+    if saveto:
+        joblib.dump(model, saveto)
+    # Возврат оценки
+    return scores
 
 
+if __name__ == '__main__':
+    from sklearn.pipeline import Pipeline
+    # Multi-layer Perceptron classifier
+    # Будем решать задачу классификации
+    from sklearn.neural_network import MLPClassifier
+    # TF-IDF оценка важности слова (term frequency - inverse document frequency)
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
+    # TODO: файлы см. архитектуру проекта
+    from reader import PickledReviewReader
+    from transformer import TextNormalizer
+
+    # TODO: пути
+    corpath = '../corpuspathname'
+    modelpath = 'a.pkl'
+
+    # Использую конвейер pipeline для удобства
+    # связывания трансформаторов и классификатора
+    pipeline = Pipeline([
+        ('Normalize', TextNormalizer()),
+        ('Vectorize', TfidfVectorizer()),
+        ('Classify', MLPClassifier(hidden_layer_sizes=[500, 150], verbose=True))
+    ])
+
+    print('Start training')
+    scores, delta = train_model(corpath, pipeline, continuous=False, saveto=modelpath)
+    print('Train complete')
+
+    # Вывод точностей модели
+    for index, score in enumerate(scores):
+        print('Accuracy on part №{}: {}'.format((index + 1), score))
+    print('Learning time: {} sec'.format(delta))
+    print('Model path: {}'.format(modelpath))
 
