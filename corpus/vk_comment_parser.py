@@ -28,5 +28,5 @@ if __name__ == "__main__":
     owner_id = str(-22822305)
     post_id = 1061966
     count = 50
-    comments = vk.wall.getComments(owner_id=owner_id, post_id=post_id, need_likes=0, count=count)
+    comments = vk.wall.getComments(owner_id=owner_id, post_id=post_id, sort='desc', count=count)
     save_data(comments, post_id, count)
