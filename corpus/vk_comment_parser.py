@@ -8,7 +8,7 @@ def save_data(comments, post_id, count):
     os.mkdir(str(post_id))
     i = 0
     while i < count:
-        data = {'overal': -1, 'commentText': comments['items'][i]['text']}
+        data = {'overal': -1, 'id': comments['items'][i]['id'], 'commentText': comments['items'][i]['text']}
         with open(str(post_id) + '/' + str(comments['items'][i]['id']) + '.json', 'w') as write_file:
             json.dump(data, write_file, ensure_ascii=False)
         i = i + 1
