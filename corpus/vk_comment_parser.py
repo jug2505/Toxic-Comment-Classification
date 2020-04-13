@@ -8,16 +8,16 @@ def save_data(comments, post_id, count):
     os.mkdir(str(post_id))
     i = 0
     while i < count:
-        data = {'overal': -1, 'id': comments['items'][i]['id'], 'commentText': comments['items'][i]['text']}
-        with open(str(post_id) + '/' + str(comments['items'][i]['id']) + '.json', 'w') as write_file:
+        data = {"overall": -1, "id": comments["items"][i]["id"], "commentText": comments["items"][i]["text"]}
+        with open(str(post_id) + '/' + str(comments["items"][i]["id"]) + ".json", 'w') as write_file:
             json.dump(data, write_file, ensure_ascii=False)
         i = i + 1
 
 
 if __name__ == "__main__":
-    print('Login: ')
+    print("Login: ")
     login = input()
-    print('Password: ')
+    print("Password: ")
     password = input()
 
     vk_session = vk_api.VkApi(login, password)
@@ -28,5 +28,5 @@ if __name__ == "__main__":
     owner_id = str(-22822305)
     post_id = 1061966
     count = 50
-    comments = vk.wall.getComments(owner_id=owner_id, post_id=post_id, sort='desc', count=count)
+    comments = vk.wall.getComments(owner_id=owner_id, post_id=post_id, sort="desc", count=count)
     save_data(comments, post_id, count)
