@@ -4,10 +4,10 @@ import nltk
 # Будем наследоваться
 from nltk.corpus.reader.api import CorpusReader
 
-DOC_PATTERN = r'(?!\.)[\w_\s]+/[\w\s\d-]+\.json'
-
 
 class JsonCorpusReader(CorpusReader):
+
+    DOC_PATTERN = r'.*\.json'
 
     def __init__(self, root, fileids=DOC_PATTERN):
         """
@@ -84,3 +84,7 @@ class JsonCorpusReader(CorpusReader):
         """
         for sentence in self.sents():
             yield nltk.pos_tag(nltk.word_tokenize(sentence, language='russian'), lang='rus')
+
+
+if __name__ == '__main__':
+    corpus = JsonCorpusReader('corpus')

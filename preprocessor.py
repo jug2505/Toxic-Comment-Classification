@@ -2,6 +2,7 @@ import os
 import nltk
 import pickle
 
+
 class Preprocessor:
     """
     Класс является обёрткой над JsonCorpusReader
@@ -56,7 +57,8 @@ class Preprocessor:
         Возвращает список предложений, который является списком
         слов с тегами
         """
-        comment = self.corpus.comments(fileids=fileid)
+        # Возвращает генератор, поэтому такой странный синтаксис
+        comment = list(self.corpus.comments(fileids=fileid))[0]
         score = comment["overall"]
         comment_text = comment["commentText"]
         # Тегизация
@@ -98,7 +100,7 @@ class Preprocessor:
         if not os.path.exists(self.target):
             os.makedirs(self.target)
 
-        for fileid in self.corpus.ids():  # TODO: ids()
+        for fileid in self.corpus.fileids():  # TODO: ids()
             yield self.process(fileid)
 
 
