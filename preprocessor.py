@@ -1,5 +1,6 @@
 import os
-
+import nltk
+import pickle
 
 class Preprocessor:
     """
@@ -35,6 +36,76 @@ class Preprocessor:
         """
         Возвращает абсолютный путь для файла на запись
         """
-        # Найдём
+        # Найдём путь относительно корня корпуса
         parent = os.path.relpath(os.path.dirname(self.corpus.abspath(fileid)), self.corpus.root)
+        # Вычисляем имя
+        basename = os.path.basename(fileid)
+        name, ext = os.path.splitext(basename)
+        # Меняем расширение на pickle
+        basename = name + ".pickle"
+        # Возвращаем путь относительно target
+        return os.path.normpath(os.path.join(self.target, parent, basename))
 
+    def tokenize(self, fileid):
+        """
+        Производит:
+        - Чтение
+        - Сегментацию на предложения sent_tokenize
+        - Токенизацию предложений word_tokenize
+        - Проставление тегов pos_tag
+        Возвращает список предложений, который является списком
+        слов с тегами
+        """
+        comment = self.corpus.comments(fileids=fileid)
+        score = comment["overall"]
+        comment_text = comment["commentText"]
+        # Тегизация
+        comment_tagged = []
+        for sentence in nltk.sent_tokenize(comment_text, language='russian'):
+            comment_tagged.append(nltk.pos_tag(nltk.word_tokenize(sentence, language='russian'), lang='rus'))
+
+        return [comment_tagged, score]
+
+    def process(self, fileid):
+        """
+        Для одного файла производит:
+        - Проверку на существование
+        - Вызов tokenize
+        - Запись в .pickle
+        """
+        target = self.abspath(fileid)
+        parent = os.path.dirname(target)
+
+        # Проверка существования
+        if not os.path.exists(parent):
+            os.makedirs(parent)
+
+        # Вызов tokenize
+        doc = self.tokenize(fileid)
+        # Выгружаем
+        with open(target, 'wb') as file_write:
+            pickle.dump(doc, file_write, pickle.HIGHEST_PROTOCOL)
+
+        # TODO: надо ли чистить память?
+        del doc
+        return target
+
+    def transform(self):
+        """
+        Собственно обработка
+        """
+        # Создадим директорию, если её ещё нет
+        if not os.path.exists(self.target):
+            os.makedirs(self.target)
+
+        for fileid in self.corpus.ids():  # TODO: ids()
+            yield self.process(fileid)
+
+
+if __name__ == '__main__':
+    from comments_reader import JsonCorpusReader
+
+    corpus = JsonCorpusReader('corpus')
+    transformer = Preprocessor(corpus, 'corpus_proc')
+    docs = transformer.transform()
+    print(len(list(docs)))

@@ -66,7 +66,7 @@ class JsonCorpusReader(CorpusReader):
         """
         for text in self.texts():
             # Выделяем предложения с пом-ю nltk
-            for sentence in nltk.sent_tokenize(text):
+            for sentence in nltk.sent_tokenize(text, language='russian'):
                 yield sentence
 
     def words(self):
