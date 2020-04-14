@@ -21,7 +21,6 @@ class JsonCorpusReader(CorpusReader):
         """
         return fileids
 
-    # TODO: Не знаю, может тут надо DOC_PATTERN писать, хотя должно и так работать
     def comments(self, fileids=None):
         """
         Возвращает генератор (для экономии памяти).
