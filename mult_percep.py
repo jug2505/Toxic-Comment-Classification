@@ -1,4 +1,3 @@
-
 import numpy as np
 # Обёртка для засекания времени
 from functools import wraps
@@ -6,9 +5,11 @@ import time
 
 # Библиотека Scikit-Learn
 # Для сохранения модели
-from sklearn.externals import joblib
+import joblib
 # Для перекрёстной проверки
 from sklearn.model_selection import cross_val_score
+
+from corpus_reader import PickledCommentsReader
 
 
 def documents(corpus):
@@ -28,9 +29,10 @@ def continuous(corpus):
 
 def make_categorical(corpus):
     """
-    TODO: Добавить метрики
+    not toxic : 0.0 < y <= 5.0
+    toxic     : 5.0 < y <= 10.0
     """
-    return np.digitize(continuous(corpus), ["TODO: Список из метрики"])
+    return np.digitize(continuous(corpus), [0.0, 5.0, 10.0])
 
 
 def timeit(func):
@@ -43,30 +45,32 @@ def timeit(func):
 
 
 @timeit
-def train_model(path, model, continuous=True, saveto=None, cv=12):
+def train_model(path, model, contin=True, saveto=None, cv=12):
     """
     Обучает модель на корпусе по пути path
     Вычисляет оценки перекрёстной проверки, используя параметр cv
     Обучает модель на всём объёме данных. Возвращает оценки.
     Запись модели по пути saveto.
-    continuous = True - нужно вызвать функцию continuous,
+    contin = True - нужно вызвать функцию continuous,
     чтобы получить входные значения X и целевые значения Y
     """
-    # Загружаем данные из корпуса TODO: класс PickledCommentsReader
+    # Загружаем данные из корпуса
     corpus = PickledCommentsReader(path)
     X = documents(corpus)
+    print(X)
     # Разделён ли уже на категории
-    if continuous:
-        Y = continuous(corpus)
+    if contin:
+        y = continuous(corpus)
         score = 'r2_score'
     else:
-        Y = make_categorical(corpus)
+        y = make_categorical(corpus)
         score = 'f1_score'
 
-    # Вычислим оценки
-    scores = cross_val_score(model, X, Y, cv=cv)
+    # Вычислим оценки TODO: scoring
+    scores = cross_val_score(model, X, y, cv=cv)
+
     # Обучаем модель
-    model.fit(X, Y)
+    model.fit(X, y)
 
     # Запись на диск
     if saveto:
@@ -83,16 +87,14 @@ if __name__ == '__main__':
     # TF-IDF оценка важности слова (term frequency - inverse document frequency)
     from sklearn.feature_extraction.text import TfidfVectorizer
 
-    # TODO: файлы см. архитектуру проекта
-    from reader import PickledReviewReader
     from transformer import TextNormalizer
 
-    # TODO: пути
-    corpath = '../corpuspathname'
-    modelpath = 'a.pkl'
+    corpath = "corpus_proc"
+    modelpath = "model.pickle"
 
     # Использую конвейер pipeline для удобства
     # связывания трансформаторов и классификатора
+
     pipeline = Pipeline([
         ('Normalize', TextNormalizer()),
         ('Vectorize', TfidfVectorizer()),
@@ -100,7 +102,7 @@ if __name__ == '__main__':
     ])
 
     print('Start training')
-    scores, delta = train_model(corpath, pipeline, continuous=False, saveto=modelpath)
+    scores, delta = train_model(corpath, pipeline, contin=False, saveto=modelpath)
     print('Train complete')
 
     # Вывод точностей модели
@@ -108,4 +110,3 @@ if __name__ == '__main__':
         print('Accuracy on part №{}: {}'.format((index + 1), score))
     print('Learning time: {} sec'.format(delta))
     print('Model path: {}'.format(modelpath))
-

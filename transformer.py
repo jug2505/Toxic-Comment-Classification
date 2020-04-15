@@ -7,9 +7,10 @@ from nltk.stem.snowball import SnowballStemmer
 # Класс для нормализации текста
 class TextNormalizer(BaseEstimator, TransformerMixin):
 
+    # TODO: разобраться с ошибкой с языком
     def __init__(self, language='russian'):
-        self.stopwords = set(nltk.corpus.stopwords.words(language))
-        self.stemmer = SnowballStemmer(language)
+        self.stopwords = set(nltk.corpus.stopwords.words('russian'))
+        self.stemmer = SnowballStemmer('russian')
 
     def is_punct(self, token):
         """
@@ -44,6 +45,7 @@ class TextNormalizer(BaseEstimator, TransformerMixin):
 
     def transform(self, documents):
         return [' '.join(self.normalize(document)) for document in documents]
+
 
 
 if __name__ == '__main__':

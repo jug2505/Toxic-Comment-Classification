@@ -40,21 +40,13 @@ class PickledCommentsReader(CorpusReader):
             for paragraph in comment:
                 yield paragraph
 
-    def sents(self, fileids=None):
-        """
-        Возвращает генератор предложений
-        """
-        for paragraph in self.paras(fileids):
-            for sent in paragraph:
-                yield sent
-
     def tagged(self, fileids=None):
         """
         Возвращает пару слово-тэг
         """
-        for sentence in self.sents():
-            for token in sentence:
-                yield token
+        for paragraph in self.paras(fileids):
+            for tagged in paragraph:
+                yield tagged
 
     def words(self, fileids=None):
         """
@@ -67,3 +59,5 @@ class PickledCommentsReader(CorpusReader):
 if __name__ == '__main__':
     reader = PickledCommentsReader('corpus_proc')
     print(len(list(reader.comments())))
+    for i in reader.no_tags_comments():
+        print(i)
