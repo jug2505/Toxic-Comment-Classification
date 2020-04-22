@@ -61,10 +61,8 @@ def train_model(path, model, contin=True, saveto=None, cv=12):
     # Разделён ли уже на категории
     if contin:
         y = continuous(corpus)
-        score = 'r2_score'
     else:
         y = make_categorical(corpus)
-        score = 'f1_score'
 
     # Вычислим оценки TODO: scoring
     scores = cross_val_score(model, X, y, cv=cv)
