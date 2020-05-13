@@ -1,9 +1,13 @@
+# vk_comment_parser.py
+# Парсер коммемнтариев под постом В Контакте
+# Сохраняет данные в JSON формате
+
 import vk_api  # Импортируем модуль vk
 import os
 import json
 
 
-# Функция сохранения базы в json
+# Функция сохранения данных в json
 def save_data(comments, post_id, count):
     os.mkdir(str(post_id))
     i = 0
@@ -24,9 +28,8 @@ if __name__ == "__main__":
     vk_session.auth()
     vk = vk_session.get_api()
 
-    # Команда ВК
-    owner_id = str(-22822305)
-    post_id = 1061966
-    count = 50
+    owner_id = str(-23064236)
+    post_id = 2045993
+    count = 100
     comments = vk.wall.getComments(owner_id=owner_id, post_id=post_id, sort="desc", count=count)
     save_data(comments, post_id, count)

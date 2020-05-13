@@ -1,3 +1,7 @@
+# preprocessor.py
+# Реализация класса первичной обработки корпуса
+# Сохранияет корпус в pickle формате
+
 import os
 import nltk
 import pickle
@@ -30,8 +34,6 @@ class Preprocessor:
                 print("Directory is needed - Preprocessor")
             else:
                 self.target = path
-
-    # TODO:  def fileids(self, fileids=None):
 
     def abspath(self, fileid):
         """
@@ -88,7 +90,6 @@ class Preprocessor:
         with open(target, 'wb') as file_write:
             pickle.dump(doc, file_write, pickle.HIGHEST_PROTOCOL)
 
-        # TODO: надо ли чистить память?
         del doc
         return target
 
@@ -100,14 +101,14 @@ class Preprocessor:
         if not os.path.exists(self.target):
             os.makedirs(self.target)
 
-        for fileid in self.corpus.fileids():  # TODO: ids()
+        for fileid in self.corpus.fileids():
             yield self.process(fileid)
 
 
 if __name__ == '__main__':
     from comments_reader import JsonCorpusReader
 
-    corpus = JsonCorpusReader('corpus')
+    corpus = JsonCorpusReader('corpus_marked')
     transformer = Preprocessor(corpus, 'corpus_proc')
-    docs = transformer.transform()
-    print(len(list(docs)))
+    documents = transformer.transform()
+    print(len(list(documents)))

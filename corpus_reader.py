@@ -1,3 +1,6 @@
+# corpus_reader.py
+# Класс чтения корпуса pickle в память
+
 import pickle
 from nltk.corpus.reader.api import CorpusReader
 

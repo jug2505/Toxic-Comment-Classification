@@ -1,5 +1,11 @@
-import codecs  # Кодировки, чтобы не было проблем с языками
-import json  # Комментарии храню в json
+# comments_reader.py
+# Реализация класса JsonCorpusReader
+# Считывает корпус в память с диска
+
+# Кодировки, чтобы не было проблем с языками
+import codecs
+# Комментарии храню в json
+import json
 import nltk
 # Будем наследоваться
 from nltk.corpus.reader.api import CorpusReader
@@ -86,4 +92,4 @@ class JsonCorpusReader(CorpusReader):
 
 
 if __name__ == '__main__':
-    corpus = JsonCorpusReader('corpus')
+    corpus = JsonCorpusReader('corpus_marked')
