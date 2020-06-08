@@ -21,12 +21,6 @@ class JsonCorpusReader(CorpusReader):
         """
         CorpusReader.__init__(self, root, fileids)
 
-    def resolve(self, fileids):
-        """
-        Возращает id файлов
-        """
-        return fileids
-
     def comments(self, fileids=None):
         """
         Возвращает генератор (для экономии памяти).
