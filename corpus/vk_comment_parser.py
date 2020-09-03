@@ -19,17 +19,41 @@ def save_data(comments, post_id, count):
 
 
 if __name__ == "__main__":
-    print("Login: ")
+    # Авторизация пользователя
+    print("Enter your login (email, phone number): ")
     login = input()
     print("Password: ")
     password = input()
 
+    # Создание активной сессии
     vk_session = vk_api.VkApi(login, password)
     vk_session.auth()
     vk = vk_session.get_api()
 
-    owner_id = str(-23064236)
-    post_id = 2045993
+    # Максимальное число комментариев, получаемое с одного запроса
     count = 100
-    comments = vk.wall.getComments(owner_id=owner_id, post_id=post_id, sort="desc", count=count)
-    save_data(comments, post_id, count)
+    # В пределах паблика спрашиваем каждый раз id поста
+    program_run = True
+    while program_run:
+        # Цикл прохода по сообществам
+        print("Enter id of the group:")
+        owner_id = '-' + input()
+        group_run = True
+        # Цикл прохода по комментариям
+        while group_run:
+            print("Enter id of the post:")
+            post_id = int(input())
+            comments = vk.wall.getComments(
+                owner_id=owner_id,
+                post_id=post_id,
+                sort="desc",
+                count=count)
+            save_data(comments, post_id, count)
+            print("Press 'q' if you want to change group or another button if not")
+            if input() == 'q':
+                group_run = False
+
+        print("Press 'q' if you want to leave the program \
+            or another button to change the active group")
+        if input() == 'q':
+            program_run = False
