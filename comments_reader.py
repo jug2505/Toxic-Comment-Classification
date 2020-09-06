@@ -70,11 +70,14 @@ class JsonCorpusReader(CorpusReader):
 
     def words(self):
         """
-        Возвращает слова (Генератор)
+        Возвращает список предложений состоящий из
+        списков слов (Генератор)
         """
         for sentence in self.sents():
+            sent_arr = []
             for word in nltk.word_tokenize(sentence, language='russian'):
-                yield word
+                sent_arr.append(word)
+            yield sent_arr
 
     def tagged_sents(self):
         """
@@ -87,3 +90,4 @@ class JsonCorpusReader(CorpusReader):
 
 if __name__ == '__main__':
     corpus = JsonCorpusReader('corpus_marked')
+    print(list(corpus.words()))
