@@ -7,7 +7,6 @@ if __name__ == '__main__':
     corpus = JsonCorpusReader('corpus_marked')
     # Формат [["слова"], ["слова"]]
     token_list = list(TextNormalizer().fit_transform(corpus.words()))
-
     # Обучение
     from gensim.models.word2vec import Word2Vec
 
@@ -44,3 +43,4 @@ if __name__ == '__main__':
     from nltk.stem.snowball import SnowballStemmer
     stemmer = SnowballStemmer('russian')
     print(model.wv.similarity(stemmer.stem("поезд"), stemmer.stem("Пусан")))
+    print(model.wv[stemmer.stem("поезд")])
