@@ -45,8 +45,8 @@ class TextNormalizer(BaseEstimator, TransformerMixin):
 
     def transform(self, documents):
         norm_corp = []
-        for sentence in documents:
-            norm_corp.append(self.normalize(sentence))
+        for comment in documents:
+            norm_corp.append(self.normalize(comment))
         return norm_corp
 
 

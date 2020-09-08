@@ -6,6 +6,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Conv1D, GlobalMaxPooling1D
 
+import nltk.tokenize
+
 # Препроцессор
 from comments_reader import JsonCorpusReader
 from transformer import TextNormalizer
@@ -17,8 +19,7 @@ from gensim.models.word2vec import Word2Vec
 
 def documents(corpus):
     """
-    Извлекает документы, маркированные частями речи,
-    из объекта чтения корпуса
+    Извлекает документы из объекта чтения корпуса
     """
     return list(TextNormalizer().fit_transform(corpus.words()))
 
@@ -49,12 +50,12 @@ def pre_process_data(corpus_name, contin=False):  # corpus_marked
     else:
         y = make_categorical(corpus)
 
-    dataset = []
+    dataset_prep = []
     for i in range(len(x)):
-        dataset.append((y[i], x[i]))
+        dataset_prep.append((y[i], x[i]))
 
-    shuffle(dataset)
-    return dataset
+    shuffle(dataset_prep)
+    return dataset_prep
 
 
 def vectorize(dataset, model_name='vk_comment_model'):
@@ -132,6 +133,14 @@ def test_len(data, maxlen):
     print('Avg length: {}'.format(total_len/len(data)))
 
 
+# Препроцессор для тествых примеров
+def prep_exm(sent):
+    sent_arr = []
+    for word in nltk.word_tokenize(sent, language='russian'):
+        sent_arr.append(word)
+    return list(TextNormalizer().normalize(sent_arr))
+
+
 if __name__ == '__main__':
     # Параметры CNN (c. 286)
     maxlen = 400
@@ -142,7 +151,7 @@ if __name__ == '__main__':
     hidden_dims = 250
     epochs = 2
 
-    dataset = pre_process_data('vk_comment_model')
+    dataset = pre_process_data('corpus_marked')
     print(dataset[0])
 
     vectorized_data = vectorize(dataset)
@@ -166,3 +175,83 @@ if __name__ == '__main__':
     y_train = np.array(y_train)
     x_test = np.reshape(x_test, (len(x_test), maxlen, embedding_dims))
     y_test = np.array(y_test)
+
+    ######################################################
+    ### Архитектура сверточной нейронной сети (c. 288) ###
+
+    # Задание нач. значения генератора случайных чисел,
+    # если нужно выбирать одинаковые начальные веса для нейронов
+    # Для отладки
+    import numpy as np
+
+    np.random.seed(1337)
+
+    # Формируем одномерную CNN
+    print('Building model ...')
+    model = Sequential()
+    model.add(Conv1D(
+        filters,
+        kernel_size,
+        padding='valid',
+        activation='relu',
+        strides=1,
+        input_shape=(maxlen, embedding_dims)
+    ))
+
+    # Субдискретизация
+    model.add(GlobalMaxPooling1D())
+
+    # Полносвязный слой с ДРОПАУТОМ (c. 291) !!!
+    model.add(Dense(hidden_dims))
+    model.add(Dropout(0.2))
+    model.add(Activation('relu'))
+
+    # Процеживание
+    model.add(Dense(1))
+    model.add(Activation('sigmoid'))
+
+    # Компиляция CNN (c. 292)
+    model.compile(
+        loss='binary_crossentropy',  # Почитать про binary_crossentropy и categorical_crossentropy
+        optimizer='adam',
+        metrics=['accuracy']
+    )
+
+    # Выходной слой для дискретной переменной
+    # При categorical_crossentropy (когда несколько классов)
+    # model.add(Dense(num_classes))
+    # model.add(Activation('sigmoid'))
+
+    # Обучение CNN
+    model.fit(
+        x_train, y_train,
+        batch_size=batch_size,
+        epochs=epochs,
+        validation_data=(x_test, y_test)
+    )
+
+    # Сохранение результатов (с. 294)
+    model_structure = model.to_json()  # Сохранение структуры
+    with open("cnn_model.json", "w") as json_file:
+        json_file.write(model_structure)
+    model.save_weights("cnn_weights.h5")  # Сохранение обученной модели (весов)
+
+    ### Применение модели в конвейере (c. 296)
+    # Загрузка сохраненной модели
+    from keras.models import model_from_json
+
+    with open("cnn_model.json", "r") as json_file:
+        json_string = json_file.read()
+    model = model_from_json(json_string)
+    model.load_weights('cnn_weights.h5')
+
+    # Тестовый пример
+    sample_1 = "Как же я обожаю уезжать в 20:10 из института"
+
+    # Предсказание
+    sample_data = prep_exm(sample_1)
+    vec_list = vectorize([(1, sample_data)])
+    test_vec_list = pad_trunc(vec_list, maxlen)
+    test_vec = np.reshape(test_vec_list, (len(test_vec_list), maxlen, embedding_dims))
+    print(model.predict(test_vec))
+    print(model.predict_classes(test_vec))

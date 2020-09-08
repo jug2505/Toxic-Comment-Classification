@@ -70,14 +70,14 @@ class JsonCorpusReader(CorpusReader):
 
     def words(self):
         """
-        Возвращает список предложений состоящий из
+        Возвращает список комментариев состоящий из
         списков слов (Генератор)
         """
-        for sentence in self.sents():
-            sent_arr = []
-            for word in nltk.word_tokenize(sentence, language='russian'):
-                sent_arr.append(word)
-            yield sent_arr
+        for comment in self.texts():
+            com_arr = []
+            for word in nltk.word_tokenize(comment, language='russian'):
+                com_arr.append(word)
+            yield com_arr
 
     def tagged_sents(self):
         """
