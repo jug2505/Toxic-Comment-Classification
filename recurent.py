@@ -175,73 +175,58 @@ if __name__ == '__main__':
     x_test = np.reshape(x_test, (len(x_test), maxlen, embedding_dims))
     y_test = np.array(y_test)
 
-    # Архитектура сверточной нейронной сети
+    # Инициплизация пустой сети Keras
+    from keras.models import Sequential
+    from keras.layers import SimpleRNN
+    from keras.layers import Dense, Dropout, Flatten
 
-    # Задание нач. значения генератора случайных чисел,
-    # если нужно выбирать одинаковые начальные веса для нейронов
-    # Для отладки
-    import numpy as np
-
-    np.random.seed(1337)
-
-    # Формируем одномерную CNN
-    print('Building model ...')
+    num_neurons = 25
     model = Sequential()
-    model.add(Conv1D(
-        filters,
-        kernel_size,
-        padding='valid',
-        activation='relu',
-        strides=1,
+
+    # Добавление рекррентного слоя
+    model.add(SimpleRNN(
+        num_neurons, return_sequences=True,
         input_shape=(maxlen, embedding_dims)
     ))
 
-    # Субдискретизация
-    model.add(GlobalMaxPooling1D())
+    # Добавление слоя дропаута (c. 318)
+    model.add(Dropout(.2))
 
-    # Полносвязный слой с ДРОПАУТОМ
-    model.add(Dense(hidden_dims))
-    model.add(Dropout(0.2))
-    model.add(Activation('relu'))
+    model.add(Flatten())
+    model.add(Dense(1, activation='sigmoid'))
 
-    # Процеживание
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+    # Компиляция нашей рекуррентной нейронной сети
+    model.compile('rmsprop', 'binary_crossentropy', metrics=['accuracy'])
+    model.summary()
 
-    # Компиляция CNN (c. 292)
-    model.compile(
-        loss='binary_crossentropy',  # Почитать про binary_crossentropy и categorical_crossentropy
-        optimizer='adam',
-        metrics=['accuracy']
-    )
+    # Обучение и сохранение модели
+    model.fit(
+        x_train, y_train,
+        batch_size=batch_size,
+        epochs=epochs,
+        validation_data=(x_test, y_test
+                         ))
 
     # Выходной слой для дискретной переменной
     # При categorical_crossentropy (когда несколько классов)
     # model.add(Dense(num_classes))
     # model.add(Activation('sigmoid'))
 
-    # Обучение CNN
-    model.fit(
-        x_train, y_train,
-        batch_size=batch_size,
-        epochs=epochs,
-        validation_data=(x_test, y_test)
-    )
 
     # Сохранение результатов
     model_structure = model.to_json()  # Сохранение структуры
-    with open("cnn_model.json", "w") as json_file:
+    with open("rec_model.json", "w") as json_file:
         json_file.write(model_structure)
-    model.save_weights("cnn_weights.h5")  # Сохранение обученной модели (весов)
+    model.save_weights("rec_weights.h5")  # Сохранение обученной модели (весов)
 
     # Применение модели в конвейере
     # Загрузка сохраненной модели
     from keras.models import model_from_json
 
-    with open("cnn_model.json", "r") as json_file:
+    with open("rec_model.json", "r") as json_file:
         json_string = json_file.read()
     model = model_from_json(json_string)
-    model.load_weights('cnn_weights.h5')
+    model.load_weights('rec_weights.h5')
 
     # Тестовый пример
     sample_1 = "темная тема"
