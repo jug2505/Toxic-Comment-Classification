@@ -1,5 +1,5 @@
 # Реализация на Keras для анализа тональности
-# Импорт (c. 283)
+# Импорт
 import numpy as np
 from keras.preprocessing import sequence
 from keras.models import Sequential
@@ -142,8 +142,8 @@ def prep_exm(sent):
 
 
 if __name__ == '__main__':
-    # Параметры CNN (c. 286)
-    maxlen = 400
+    # Параметры CNN
+    maxlen = 100
     batch_size = 32
     embedding_dims = 300
     filters = 250
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     y_test = expected[split_point:]
 
     # Выбор maxlen
-    test_len(vectorized_data, 400)  # Надо брать среднюю длины
+    test_len(vectorized_data, 100)  # Надо брать среднюю длины
 
     # Собираем наши дополненные и усеченные данные
     x_train = pad_trunc(x_train, maxlen)
@@ -176,8 +176,7 @@ if __name__ == '__main__':
     x_test = np.reshape(x_test, (len(x_test), maxlen, embedding_dims))
     y_test = np.array(y_test)
 
-    ######################################################
-    ### Архитектура сверточной нейронной сети (c. 288) ###
+    # Архитектура сверточной нейронной сети
 
     # Задание нач. значения генератора случайных чисел,
     # если нужно выбирать одинаковые начальные веса для нейронов
@@ -201,7 +200,7 @@ if __name__ == '__main__':
     # Субдискретизация
     model.add(GlobalMaxPooling1D())
 
-    # Полносвязный слой с ДРОПАУТОМ (c. 291) !!!
+    # Полносвязный слой с ДРОПАУТОМ
     model.add(Dense(hidden_dims))
     model.add(Dropout(0.2))
     model.add(Activation('relu'))
@@ -230,13 +229,13 @@ if __name__ == '__main__':
         validation_data=(x_test, y_test)
     )
 
-    # Сохранение результатов (с. 294)
+    # Сохранение результатов
     model_structure = model.to_json()  # Сохранение структуры
     with open("cnn_model.json", "w") as json_file:
         json_file.write(model_structure)
     model.save_weights("cnn_weights.h5")  # Сохранение обученной модели (весов)
 
-    ### Применение модели в конвейере (c. 296)
+    # Применение модели в конвейере
     # Загрузка сохраненной модели
     from keras.models import model_from_json
 
@@ -253,5 +252,7 @@ if __name__ == '__main__':
     vec_list = vectorize([(1, sample_data)])
     test_vec_list = pad_trunc(vec_list, maxlen)
     test_vec = np.reshape(test_vec_list, (len(test_vec_list), maxlen, embedding_dims))
+    print()
     print(model.predict(test_vec))
+    print()
     print(model.predict_classes(test_vec))
