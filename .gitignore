@@ -1,2 +1,6 @@
 /.idea/
-/venv/
+/corpus_marked/
+*.json
+*.h5
+vk_comment_model
+/__pycache__/
