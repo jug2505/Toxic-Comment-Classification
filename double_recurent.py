@@ -148,7 +148,7 @@ if __name__ == '__main__':
     filters = 250
     kernel_size = 3
     hidden_dims = 250
-    epochs = 2
+    epochs = 5
 
     dataset = pre_process_data('corpus_marked')
     print(dataset[0])
@@ -243,4 +243,4 @@ if __name__ == '__main__':
     print()
     print(model.predict(test_vec))
     print()
-    print(model.predict_classes(test_vec))
+    print(np.argmax(model.predict(test_vec), axis=-1))
