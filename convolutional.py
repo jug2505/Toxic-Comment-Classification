@@ -148,7 +148,7 @@ if __name__ == '__main__':
     filters = 250
     kernel_size = 3
     hidden_dims = 250
-    epochs = 2
+    epochs = 10
 
     dataset = pre_process_data('corpus_marked')
     print(dataset[0])
@@ -244,7 +244,7 @@ if __name__ == '__main__':
     model.load_weights('cnn_weights.h5')
 
     # Тестовый пример
-    sample_1 = "темная тема"
+    sample_1 = "Темная тема"
 
     # Предсказание
     sample_data = prep_exm(sample_1)
@@ -254,4 +254,4 @@ if __name__ == '__main__':
     print()
     print(model.predict(test_vec))
     print()
-    print(model.predict_classes(test_vec))
+    print(np.argmax(model.predict(test_vec), axis=-1))
