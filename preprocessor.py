@@ -133,6 +133,7 @@ class Preprocessor:
         print('Truncated: {}'.format(truncated))
         print('Avg length: {}'.format(total_len / len(data)))
 
+    @staticmethod
     def prep_exm(sent):
         """
         Препроцессор для тествых примеров
@@ -165,6 +166,12 @@ class Preprocessor:
         y_test = np.array(y_test)
 
         return x_train, y_train, x_test, y_test
+
+    def exm_pipeline(self, sample, maxlen, embedding_dims):
+        sample_data = self.prep_exm(sample)
+        vec_list = self.vectorize([(0, sample_data)])
+        test_vec_list = self.pad_trunc(vec_list, maxlen)
+        return np.reshape(test_vec_list, (len(test_vec_list), maxlen, embedding_dims))
 
 
 if __name__ == '__main__':
