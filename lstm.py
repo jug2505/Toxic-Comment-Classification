@@ -25,7 +25,7 @@ if __name__ == '__main__':
     maxlen = 200
     batch_size = 32
     embedding_dims = 300
-    epochs = 5
+    epochs = 7
     num_neurons = 50
 
     prep = Preprocessor('corpus_marked', 'vk_comment_model')
