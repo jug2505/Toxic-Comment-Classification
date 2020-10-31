@@ -1,25 +1,20 @@
+# recurent.py
+# Реализация рекуррентной нейросети для анализа
+# "языка вражды" в сообщениях
 # Реализация на Keras для анализа тональности
 # Импорт
 import numpy as np
-from keras.preprocessing import sequence
+from keras.layers import SimpleRNN
+from keras.layers import Dense, Dropout, Flatten
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Conv1D, GlobalMaxPooling1D
-
-import nltk.tokenize
+from keras.models import model_from_json
 
 # Препроцессор
-from comments_reader import JsonCorpusReader
-from transformer import TextNormalizer
-from random import shuffle
 from preprocessor import Preprocessor
-
-# Для векторизатора
-from gensim.models.word2vec import Word2Vec
 
 
 if __name__ == '__main__':
-    # Параметры CNN
+    # Параметры RNN
     maxlen = 100
     batch_size = 32
     embedding_dims = 300
@@ -27,16 +22,12 @@ if __name__ == '__main__':
     kernel_size = 3
     hidden_dims = 250
     epochs = 5
+    num_neurons = 25
 
     prep = Preprocessor('corpus_marked', 'vk_comment_model')
     x_train, y_train, x_test, y_test = prep.train_pipeline(maxlen, embedding_dims)
 
     # Инициплизация пустой сети Keras
-    from keras.models import Sequential
-    from keras.layers import SimpleRNN
-    from keras.layers import Dense, Dropout, Flatten
-
-    num_neurons = 25
     model = Sequential()
 
     # Добавление рекррентного слоя
@@ -45,7 +36,7 @@ if __name__ == '__main__':
         input_shape=(maxlen, embedding_dims)
     ))
 
-    # Добавление слоя дропаута (c. 318)
+    # Добавление слоя дропаута
     model.add(Dropout(.2))
 
     model.add(Flatten())
@@ -63,12 +54,6 @@ if __name__ == '__main__':
         validation_data=(x_test, y_test
                          ))
 
-    # Выходной слой для дискретной переменной
-    # При categorical_crossentropy (когда несколько классов)
-    # model.add(Dense(num_classes))
-    # model.add(Activation('sigmoid'))
-
-
     # Сохранение результатов
     model_structure = model.to_json()  # Сохранение структуры
     with open("rec_model.json", "w") as json_file:
@@ -77,7 +62,6 @@ if __name__ == '__main__':
 
     # Применение модели в конвейере
     # Загрузка сохраненной модели
-    from keras.models import model_from_json
 
     with open("rec_model.json", "r") as json_file:
         json_string = json_file.read()

@@ -1,10 +1,7 @@
+# preprocessor.py
+# Предварительная обработка
 # Импорт
 import numpy as np
-from keras.preprocessing import sequence
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Conv1D, GlobalMaxPooling1D
-
 import nltk.tokenize
 
 # Препроцессор
@@ -44,6 +41,9 @@ class Preprocessor:
         return np.digitize(self.continuous(corpus), [5.0, 11.0])
 
     def pre_process_data(self, contin=False):
+        """
+        Загрузка данных и разделение на категории
+        """
         # Загружаем данные из корпуса
         corpus = JsonCorpusReader(self.corpus_name)
         x = self.documents(corpus)
@@ -62,6 +62,9 @@ class Preprocessor:
         return dataset_prep
 
     def vectorize(self, dataset):
+        """
+        Векторизация
+        """
         model_vec = Word2Vec.load(self.model_name)
         word_vectors = model_vec.wv
 
@@ -79,7 +82,9 @@ class Preprocessor:
 
     @staticmethod
     def collect_expected(dataset):
-        """ Выбираем целевые значения из набора данных """
+        """
+        Выбираем целевые значения из набора данных
+        """
         expected_set = []
         for sample in dataset:
             expected_set.append(sample[0])

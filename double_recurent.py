@@ -1,21 +1,19 @@
+# double_recurent.py
+# Реализация двунаправленной рекуррентной нейросети для анализа
+# "языка вражды" в сообщениях
 # Реализация на Keras для анализа тональности
+
 # Импорт
 import numpy as np
-from keras.preprocessing import sequence
+from keras.layers import SimpleRNN, Flatten
+from keras.layers.wrappers import Bidirectional
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Conv1D, GlobalMaxPooling1D
-
-import nltk.tokenize
+from keras.layers import Dense, Dropout
 
 # Препроцессор
-from comments_reader import JsonCorpusReader
-from transformer import TextNormalizer
-from random import shuffle
 from preprocessor import Preprocessor
 
-# Для векторизатора
-from gensim.models.word2vec import Word2Vec
+from keras.models import model_from_json
 
 
 if __name__ == '__main__':
@@ -27,19 +25,12 @@ if __name__ == '__main__':
     kernel_size = 3
     hidden_dims = 250
     epochs = 5
+    num_neurons = 10
 
     prep = Preprocessor('corpus_marked', 'vk_comment_model')
     x_train, y_train, x_test, y_test = prep.train_pipeline(maxlen, embedding_dims)
 
-    ### Создание двунаправленной рекуррентной сети ###
-    from keras.models import Sequential
-    from keras.layers import SimpleRNN, Dense, Dropout, Flatten
-    from keras.layers.wrappers import Bidirectional
-
-    num_neurons = 10
-    maxlen = 100
-    embedding_dims = 300
-
+    # Создание двунаправленной рекуррентной сети
     model = Sequential()
     model.add(Bidirectional(
         SimpleRNN(
@@ -48,7 +39,7 @@ if __name__ == '__main__':
         ), input_shape=(maxlen, embedding_dims)))
 
 
-    # Добавление слоя дропаута (c. 318)
+    # Добавление слоя дропаута
     model.add(Dropout(.2))
 
     model.add(Flatten())
@@ -67,12 +58,6 @@ if __name__ == '__main__':
         validation_data=(x_test, y_test
                          ))
 
-    # Выходной слой для дискретной переменной
-    # При categorical_crossentropy (когда несколько классов)
-    # model.add(Dense(num_classes))
-    # model.add(Activation('sigmoid'))
-
-
     # Сохранение результатов
     model_structure = model.to_json()  # Сохранение структуры
     with open("double_rec_model.json", "w") as json_file:
@@ -81,7 +66,6 @@ if __name__ == '__main__':
 
     # Применение модели в конвейере
     # Загрузка сохраненной модели
-    from keras.models import model_from_json
 
     with open("double_rec_model.json", "r") as json_file:
         json_string = json_file.read()

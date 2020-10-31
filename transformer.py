@@ -24,9 +24,15 @@ class TextNormalizer(BaseEstimator, TransformerMixin):
         return all(unicodedata.category(char).startswith('P') for char in token)
 
     def is_stopword(self, token):
+        """
+        Является ли токен стоп-словом
+        """
         return token.lower() in self.stopwords
 
     def stemming(self, token):
+        """
+        Непосредственно стемминг
+        """
         return self.stemmer.stem(token)
 
     def normalize(self, sent):

@@ -1,11 +1,15 @@
+# lstm.py
+# Реализация нейросети с долгой краткосрочной памятью
+#  для анализа "языка вражды" в сообщениях
 # Реализация на Keras для анализа тональности
+
 # Импорт
 import numpy as np
 from keras.preprocessing import sequence
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
+from keras.layers import Dense, Dropout, Flatten, LSTM
 from keras.layers import Conv1D, GlobalMaxPooling1D
-
+from keras.models import model_from_json
 import nltk.tokenize
 
 # Препроцессор
@@ -22,15 +26,12 @@ if __name__ == '__main__':
     batch_size = 32
     embedding_dims = 300
     epochs = 5
+    num_neurons = 50
 
     prep = Preprocessor('corpus_marked', 'vk_comment_model')
     x_train, y_train, x_test, y_test = prep.train_pipeline(maxlen, embedding_dims)
 
     # LSTM
-    from keras.models import Sequential
-    from keras.layers import Dense, Dropout, Flatten, LSTM
-
-    num_neurons = 50
     model = Sequential()
 
     model.add(LSTM(
@@ -59,7 +60,6 @@ if __name__ == '__main__':
         json_file.write(model_structure)
     model.save_weights("lstm_weights.h5")  # Сохранение обученной модели (весов)
 
-    from keras.models import model_from_json
 
     with open("lstm_model.json", "r") as json_file:
         json_string = json_file.read()

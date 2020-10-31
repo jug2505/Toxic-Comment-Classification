@@ -1,24 +1,23 @@
-# Реализация на Keras для анализа тональности
+# convolitional.py
+# Реализация сверточной нейросети для анализа
+# "языка вражды" в сообщениях
 # Импорт
-import numpy as np
-from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Conv1D, GlobalMaxPooling1D
-
-import nltk.tokenize
+import numpy as np
+from keras.models import model_from_json
 
 # Препроцессор
-from comments_reader import JsonCorpusReader
-from transformer import TextNormalizer
-from random import shuffle
 from preprocessor import Preprocessor
-
-# Для векторизатора
-from gensim.models.word2vec import Word2Vec
 
 
 if __name__ == '__main__':
+    # Задание нач. значения генератора случайных чисел,
+    # если нужно выбирать одинаковые начальные веса для нейронов
+    # для отладки
+    np.random.seed(1337)
+
     # Параметры CNN
     maxlen = 100
     batch_size = 32
@@ -32,14 +31,6 @@ if __name__ == '__main__':
     x_train, y_train, x_test, y_test = prep.train_pipeline(maxlen, embedding_dims)
 
     # Архитектура сверточной нейронной сети
-
-    # Задание нач. значения генератора случайных чисел,
-    # если нужно выбирать одинаковые начальные веса для нейронов
-    # Для отладки
-    import numpy as np
-
-    np.random.seed(1337)
-
     # Формируем одномерную CNN
     print('Building model ...')
     model = Sequential()
@@ -55,7 +46,7 @@ if __name__ == '__main__':
     # Субдискретизация
     model.add(GlobalMaxPooling1D())
 
-    # Полносвязный слой с ДРОПАУТОМ
+    # Полносвязный слой с дропаутом
     model.add(Dense(hidden_dims))
     model.add(Dropout(0.2))
     model.add(Activation('relu'))
@@ -64,17 +55,12 @@ if __name__ == '__main__':
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
 
-    # Компиляция CNN (c. 292)
+    # Компиляция CNN
     model.compile(
-        loss='binary_crossentropy',  # Почитать про binary_crossentropy и categorical_crossentropy
+        loss='binary_crossentropy',  # TODO: Почитать про binary_crossentropy и categorical_crossentropy
         optimizer='adam',
         metrics=['accuracy']
     )
-
-    # Выходной слой для дискретной переменной
-    # При categorical_crossentropy (когда несколько классов)
-    # model.add(Dense(num_classes))
-    # model.add(Activation('sigmoid'))
 
     # Обучение CNN
     model.fit(
@@ -92,7 +78,6 @@ if __name__ == '__main__':
 
     # Применение модели в конвейере
     # Загрузка сохраненной модели
-    from keras.models import model_from_json
 
     with open("cnn_model.json", "r") as json_file:
         json_string = json_file.read()

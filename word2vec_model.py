@@ -1,14 +1,18 @@
+# word2vec_model.py
 # Создание собственной модели word2vec
 from comments_reader import JsonCorpusReader
 from transformer import TextNormalizer
+# Для обучения
+from gensim.models.word2vec import Word2Vec
+# Для тестов
+from nltk.stem.snowball import SnowballStemmer
+
 
 if __name__ == '__main__':
-    # Предварительная обработка (с. 233)
+    # Предварительная обработка
     corpus = JsonCorpusReader('corpus_marked')
     # Формат [["слова"], ["слова"]]
     token_list = list(TextNormalizer().fit_transform(corpus.words()))
-    # Обучение
-    from gensim.models.word2vec import Word2Vec
 
     # Параметры
     num_features = 300
@@ -35,12 +39,9 @@ if __name__ == '__main__':
     model.save(model_name)
 
     # Загрузка
-    from gensim.models.word2vec import Word2Vec
-
     model_name = "vk_comment_model"
     model = Word2Vec.load(model_name)
 
-    from nltk.stem.snowball import SnowballStemmer
     stemmer = SnowballStemmer('russian')
     print(model.wv.similarity(stemmer.stem("поезд"), stemmer.stem("Пусан")))
     print(model.wv[stemmer.stem("поезд")])
