@@ -18,7 +18,7 @@ class ClassificationService(ServiceBase):
 
         test_vec = Preprocessor('corpus_marked', 'vk_comment_model') \
             .exm_pipeline(sentence, 200, 300)
-        return str(np.argmax(model.predict(test_vec), axis=-1))
+        return str(np.around(model.predict(test_vec)))
 
 
 app = Application([ClassificationService], tns='spyne.examples.hello.http',
