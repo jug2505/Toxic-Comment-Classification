@@ -77,7 +77,7 @@ if __name__ == '__main__':
     batch_size = 32
     embedding_dims = 300
     epochs = 10
-    num_neurons = 50
+    num_neurons = 300
 
     prep = Preprocessor('corpus_marked', 'vk_comment_model')
     x_train, y_train, x_test, y_test = prep.train_pipeline(maxlen, embedding_dims)
