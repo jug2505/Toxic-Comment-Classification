@@ -13,7 +13,7 @@ def save_data(comments, post_id, count):
     i = 0
     while i < count:
         data = {"overall": -1, "id": comments["items"][i]["id"], "commentText": comments["items"][i]["text"]}
-        with open(str(post_id) + '/' + str(comments["items"][i]["id"]) + ".json", 'w') as write_file:
+        with open(str(post_id) + '/' + str(comments["items"][i]["id"]) + ".json", 'w', encoding='utf-8') as write_file:
             json.dump(data, write_file, ensure_ascii=False)
         i = i + 1
 
