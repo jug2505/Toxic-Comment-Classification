@@ -1,3 +1,7 @@
+# service.py
+# Работает с Apache
+# Вход - GET запрос со строкой
+# Выход - Класс сообщения в JSON формате
 from spyne import Application, rpc, ServiceBase, Unicode
 from spyne.protocol.http import HttpRpc
 from spyne.protocol.json import JsonDocument

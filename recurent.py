@@ -2,13 +2,13 @@
 # Реализация рекуррентной нейросети для анализа
 # "языка вражды" в сообщениях
 # Реализация на Keras для анализа тональности
+
 # Импорт
 import numpy as np
 from keras.layers import SimpleRNN
 from keras.layers import Dense, Dropout, Flatten
 from keras.models import Sequential
 from keras.models import model_from_json
-
 # Препроцессор
 from preprocessor import Preprocessor
 
@@ -62,7 +62,6 @@ if __name__ == '__main__':
 
     # Применение модели в конвейере
     # Загрузка сохраненной модели
-
     with open("rec_model.json", "r") as json_file:
         json_string = json_file.read()
     model = model_from_json(json_string)

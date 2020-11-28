@@ -1,5 +1,5 @@
 # word2vec_model.py
-# Создание собственной модели word2vec
+# Создание предметной модели word2vec
 from comments_reader import JsonCorpusReader
 from transformer import TextNormalizer
 # Для обучения

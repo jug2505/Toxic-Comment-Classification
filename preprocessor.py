@@ -3,12 +3,10 @@
 # Импорт
 import numpy as np
 import nltk.tokenize
-
 # Препроцессор
 from comments_reader import JsonCorpusReader
 from transformer import TextNormalizer
 from random import shuffle
-
 # Для векторизатора
 from gensim.models.word2vec import Word2Vec
 

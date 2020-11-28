@@ -1,30 +1,19 @@
 # lstm.py
 # Реализация нейросети с долгой краткосрочной памятью
-#  для анализа "языка вражды" в сообщениях
+# для анализа "языка вражды" в сообщениях
 # Реализация на Keras для анализа тональности
 
 # Импорт
 import numpy as np
-from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, LSTM
-from keras.layers import Conv1D, GlobalMaxPooling1D
 from keras.models import model_from_json
-import nltk.tokenize
-
 # Препроцессор
-from comments_reader import JsonCorpusReader
-from transformer import TextNormalizer
-from random import shuffle
 from preprocessor import Preprocessor
-
-# Для векторизатора
-from gensim.models.word2vec import Word2Vec
 # Для создания матрицы ошибок
 from sklearn.metrics import confusion_matrix
 # Метрики
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-
 # Для визуализации
 import itertools
 import matplotlib.pyplot as plt
