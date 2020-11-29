@@ -61,7 +61,27 @@ def plot_confusion_matrix(cm, classes, title="Матрица ошибок", cmap
     return plt
 
 
+def corpus_plot_categor():
+    """
+    Вывод графика количества документов в корпусе
+    согласно метрике их классификации
+    """
+    prep = Preprocessor('corpus_marked', 'vk_comment_model')
+    dataset = prep.pre_process_data()
+    k = 0
+    j = 0
+    for i in dataset:
+        if i[0] == 0:
+            k = k + 1
+        else:
+            j = j + 1
+    plt.bar(["Неоскорбительные", "Оскорбительные"], [k, j], color='#539caf', align='center')
+    plt.show()
+
+
 if __name__ == '__main__':
+    corpus_plot_categor()
+
     maxlen = 200
     batch_size = 32
     embedding_dims = 300
